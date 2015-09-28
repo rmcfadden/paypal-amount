@@ -18,6 +18,7 @@ class paypalAmount {
     private $options;
     private static $page_name = 'paypal_amount';
     private static $options_name = 'paypal_amount_options';
+    private $default_textbox_text = '';
 
     // https://developer.paypal.com/docs/classic/api/buttons/
     private static $paypal_buttons = array(
@@ -58,6 +59,8 @@ class paypalAmount {
             'button_id' => 0,
             'button_size' => 'small',
             'button_type' => 'buynow',
+            'textbox_location' => 'top',
+            'textbox_text' => $default_textbox_text,
             'target' => 'paypal'
         );
 
@@ -76,6 +79,8 @@ class paypalAmount {
         add_action('admin_init', array( $this, 'admin_init' ));
         add_action('init', array( $this, 'init' ));
 
+        $this->default_textbox_text  = __('Please enter payment amount and hit the buttton below');
+
     }
 
     // Good refeence for paypal button code: http://planetoftheweb.com/components/promos.php?id=542
@@ -89,8 +94,7 @@ class paypalAmount {
             $button_id = $options['button_id'];
 
             if(isset(paypalAmount::$paypal_buttons[$button_id])){
-                $image_url = paypalAmount::$paypal_buttons[$button_id][1];
-                
+                $image_url = paypalAmount::$paypal_buttons[$button_id][1];                
             }
         }
 
@@ -116,9 +120,21 @@ class paypalAmount {
             $target = $options['target'];
         }
 
+
+        $textbox_location = 'top';
+        if(isset($options['textbox_location'])){
+            $textbox_location = $options['textbox_location'];
+        }
+
+
+        $textbox_text = 'top';
+        if(isset($options['textbox_location'])){
+            $textbox_location = $options['textbox_location'];
+        }
+
 	    return '<form   action="https://www.paypal.com/cgi-bin/webscr" method="post">
     			<div class="paypal_amount">
-                    <input type="hidden" name="cmd" value="_xclick">
+                    <input type="hidden" name="cmd" value="' . $cmd_value . '">
 			        <input type="hidden" name="business" value="' . $paypal_id . '">
 			        <input type="text" name="amount" onkeyup="checkDecimal(this)" value="0.00" >
 			        <input type="image" src="'. $image_url . '" name="submit">
@@ -209,6 +225,27 @@ class paypalAmount {
             $section_name,
 		    array( 'label_for' => 'button_id' )
 	    );
+
+
+	    add_settings_field(
+		    'textbox_location', 
+            __('Textbox location:'), 
+		    array($this,'paypal_button_textbox_location'), 
+		    paypalAmount::$page_name, 
+            $section_name,
+		    array( 'label_for' => 'textbox_location' )
+	    );
+
+
+        add_settings_field(
+		    'textbox_text', 
+            __('Text:'), 
+		    array($this,'paypal_button_textbox_text'), 
+		    paypalAmount::$page_name, 
+            $section_name,
+		    array( 'label_for' => 'textbox_text' )
+	    );
+
     }
 
 
@@ -219,6 +256,40 @@ class paypalAmount {
 	    echo "<input class='regular-text ltr' name='{$current_options_name}[paypal_id]' id='paypal_id'  value='{$options['paypal_id']}'/>";
     }
 
+
+    function paypal_button_textbox_text(){
+ 
+        $options = get_option(paypalAmount::$options_name);
+        $current_options_name = paypalAmount::$options_name;
+
+        $textbox_text = __('Please enter payment amount and hit the buttton below');
+        if(isset($options['textbox_text'])){
+            $textbox_text = $options['textbox_text'];
+        }
+ 
+        echo "<input class='regular-text ltr' name='{$current_options_name}[textbox_text]' id='textbox_text'  value='{$textbox_text}'/>";
+        
+    }
+
+
+    function paypal_button_textbox_location(){
+        
+        $options = get_option(paypalAmount::$options_name);
+        $current_options_name = paypalAmount::$options_name;
+
+        $textbox_location = 'top';
+        if(isset($options['textbox_location'])){
+            $textbox_location = $options['textbox_location'];
+        }
+
+
+        ?>
+        <select id='paypal_amount_textbox_location' name='<?= $current_options_name ?>[textbox_location]'>
+            <option value='hidden' <?php if($textbox_location  == 'hidden') { echo 'selected'; }  ?>>Hidden</option>
+            <option value='top' <?php if($textbox_location  == 'top') { echo 'selected'; }  ?>>Top</option>
+	    </select>
+	    <?php                  
+    }
 
 
     function paypal_button_size_callback() {
@@ -238,8 +309,7 @@ class paypalAmount {
             <option value='large' <?php if($button_size == 'large') { echo 'selected'; }  ?>>Large</option>
             <option value='extralarge' <?php if($button_size == 'extralarge') { echo 'selected'; }  ?>>Extra Large</option>
 	    </select>
-	    <?php          
-        
+	    <?php                  
     }
 
 
