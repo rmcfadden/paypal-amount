@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Paypal Amount
 * Plugin URI: https://github.com/rmcfadden/paypal-amount
-* Description: Add a paypal button to your wordpress site with a payment amount textbox.  Choose between many paypal buttons.
+* Description: Add a paypal button to your wordpress site with an a optinal payment amount textbox.  Choose from multiple paypal buttons.
 * Version: 1.0
 * Author: Ryan McFadden
 * Author URI: https://github.com/rmcfadden
@@ -149,7 +149,7 @@ class paypalAmount {
             $currency = $options['currency'];
         }
 
-        $text_amount_label = '<label>' . $amount_description  . '</label>';
+        $text_amount_label = "<label>" . $amount_description  . "</label>\n";
         $text_amount_text = '<input type="text" class="paypal-amount-textbox" name="amount" onkeyup="paypal_amount_check_decimal(this)" value="' . $amount_default . '" >';
         if($textbox_location == 'hidden'){
             $text_amount_label = '';
@@ -419,7 +419,6 @@ class paypalAmount {
                 </label>
             </p>
             <?php          
-
         endforeach;	
     }
 
@@ -456,7 +455,6 @@ class paypalAmount {
             'USD' => 'U.S. Dollars ($)',
         );
 
-
         $currency = 'USD';
         if(isset($options['currency'])){
             $currency  = $options['currency'];
@@ -478,7 +476,6 @@ class paypalAmount {
         </select>
         <?php
     }
-
 
 
     function options_callback() {
