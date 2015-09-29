@@ -9,5 +9,5 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-Add a paypal button to your wordpress site with a payment amount textbox.  Choose between many paypal buttons.
+Add a paypal button to your wordpress site with a payment amount textbox.  Choose from multiple paypal buttons.
 

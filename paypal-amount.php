@@ -21,7 +21,7 @@ class paypalAmount {
     private $options;
     private static $page_name = 'paypal_amount';
     private static $options_name = 'paypal_amount_options';
-    private $default_textbox_text = '';
+    private $default_amount_description = '';
 
     // https://developer.paypal.com/docs/classic/api/buttons/
     private static $paypal_buttons = array(
@@ -65,8 +65,9 @@ class paypalAmount {
             'button_size' => 'small',
             'button_type' => 'buynow',
             'textbox_location' => 'top',
-            'textbox_text' => $default_textbox_text,
-            'target' => 'paypal'
+            'amount_description' => $default_amount_description,
+            'amount_default' => 20.00,
+            'currency' => 'USD'
         );
 
         if ( get_option(paypalAmount::$options_name ) !== false ) {
@@ -85,7 +86,7 @@ class paypalAmount {
         add_action('admin_init', array( $this, 'admin_init' ));
         add_action('init', array( $this, 'init' ));
 
-        $this->default_textbox_text  = __('Please enter payment amount and hit the buttton below:');
+        $this->default_amount_description  = __('Please enter payment amount and hit the buttton below:');
 
     }
 
@@ -133,33 +134,44 @@ class paypalAmount {
             $textbox_location = $options['textbox_location'];
         }
 
-        $textbox_text = $this->default_textbox_text;
-        if(isset($options['textbox_text'])){
-            $textbox_text = $options['textbox_text'];
+        $amount_description = $this->default_amount_description;
+        if(isset($options['amount_description'])){
+            $amount_description = $options['amount_description'];
         }
 
-        $text_amount_label = '<label>' . $textbox_text  . '</label>';
-        $text_amount_text = '<input type="text" class="paypal-amount-textbox" name="amount" onkeyup="checkDecimal(this)" value="0.00" >';
+        $amount_default = 20.00;
+        if(isset($options['amount_default'])){
+            $amount_default = $options['amount_default'];
+        }
+
+        $currency = 'USD';
+        if(isset($options['currency'])){
+            $currency = $options['currency'];
+        }
+
+        $text_amount_label = '<label>' . $amount_description  . '</label>';
+        $text_amount_text = '<input type="text" class="paypal-amount-textbox" name="amount" onkeyup="paypal_amount_check_decimal(this)" value="' . $amount_default . '" >';
         if($textbox_location == 'hidden'){
             $text_amount_label = '';
             $text_amount_text = '';
         }
 
         return '<form   action="https://www.paypal.com/cgi-bin/webscr" method="post">
-            <div class="paypal_amount">
-            <input type="hidden" name="cmd" value="' . $cmd_value . '">
-            <input type="hidden" name="business" value="' . $paypal_id . '">'
-            . $text_amount_label 
-            . $text_amount_text .
-            '<input type="image" src="'. $image_url . '" name="submit">
-            <input type="hidden" name="currency_code" value="USD">
+            <div class="paypal-amount">
+                <input type="hidden" name="cmd" value="' . $cmd_value . '">
+                <input type="hidden" name="business" value="' . $paypal_id . '">'
+                . $text_amount_label 
+                . $text_amount_text .
+                '<input type="image" src="'. $image_url . '" name="submit">
+                <input type="hidden" name="currency_code" value="' . $currency .'">
             </div>
             </form>';
     }
 
 
     public function init() {
-        wp_enqueue_script('paypal-amount.js', plugin_dir_url(__FILE__) . 'paypal-amount.js', array('jquery'));  
+        wp_enqueue_script('paypal-amount.js', plugin_dir_url(__FILE__) . 'paypal-amount.js', array('jquery')); 
+        wp_enqueue_style( 'paypal-amount', plugin_dir_url(__FILE__) . 'paypal-amount.css' ); 
     }
 
 
@@ -189,6 +201,7 @@ class paypalAmount {
     public function admin_init() {
 
         wp_enqueue_script('paypal-amount-admin.js', plugin_dir_url(__FILE__) . 'paypal-amount-admin.js', array('jquery'));
+        wp_enqueue_script('paypal-amount.js', plugin_dir_url(__FILE__) . 'paypal-amount.js', array('jquery')); 
 
         register_setting(
             paypalAmount::$options_name,
@@ -207,17 +220,26 @@ class paypalAmount {
 
         add_settings_field(
             'paypal_id', 
-            __('PayPal id:'), 
+            __('PayPal id/Email:'), 
             array($this,'paypal_id_callback'), 
             paypalAmount::$page_name, 
             $section_name,
             array( 'label_for' => 'paypal_id' )
         );
 
+         add_settings_field(
+            'currency', 
+            __('Currency:'), 
+            array($this,'currency_callback'), 
+            paypalAmount::$page_name, 
+            $section_name,
+            array( 'label_for' => 'currency' )
+        );
+
         add_settings_field(
             'button_type', 
             __('Button type:'), 
-            array($this,'paypal_button_type_callback'), 
+            array($this,'button_type_callback'), 
             paypalAmount::$page_name, 
             $section_name,
             array( 'label_for' => 'button_type' )
@@ -227,7 +249,7 @@ class paypalAmount {
         add_settings_field(
             'button_size', 
             __('Button size:'), 
-            array($this,'paypal_button_size_callback'), 
+            array($this,'button_size_callback'), 
             paypalAmount::$page_name, 
             $section_name,
             array( 'label_for' => 'button_size' )
@@ -237,7 +259,7 @@ class paypalAmount {
         add_settings_field(
             'button_id', 
             __('Choose a button:'), 
-            array($this,'paypal_button_callback'), 
+            array($this,'button_callback'), 
             paypalAmount::$page_name, 
             $section_name,
             array( 'label_for' => 'button_id' )
@@ -247,7 +269,7 @@ class paypalAmount {
         add_settings_field(
             'textbox_location', 
             __('Textbox location:'), 
-            array($this,'paypal_button_textbox_location'), 
+            array($this,'textbox_location_callback'), 
             paypalAmount::$page_name, 
             $section_name,
             array( 'label_for' => 'textbox_location' )
@@ -255,13 +277,35 @@ class paypalAmount {
 
 
         add_settings_field(
-            'textbox_text', 
+            'amount_description', 
             __('Text:'), 
-            array($this,'paypal_button_textbox_text'), 
+            array($this,'amount_description_callback'), 
             paypalAmount::$page_name, 
             $section_name,
-            array( 'label_for' => 'textbox_text' )
+            array( 'label_for' => 'amount_description' )
         );
+
+       add_settings_field(
+            'amount_default', 
+            __('Amount Default:'), 
+            array($this,'amount_default_callback'), 
+            paypalAmount::$page_name, 
+            $section_name,
+            array( 'label_for' => 'amount_default' )
+        );
+    }
+
+
+    function amount_default_callback(){
+        $options = get_option(paypalAmount::$options_name);
+        $current_options_name = paypalAmount::$options_name;
+
+        $amount_default = 20.00;
+        if(isset($options['amount_default'])){
+            $amount_default = $options['amount_default'];
+        }
+
+        echo "<input class='regular-text ltr' id='amount_default' name='{$current_options_name}[amount_default]' onkeyup='paypal_amount_check_decimal(this)' value='{$amount_default}' >";
     }
 
 
@@ -273,20 +317,20 @@ class paypalAmount {
     }
 
 
-    function paypal_button_textbox_text(){
+    function amount_description_callback(){
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;
 
-        $textbox_text = __('Please enter payment amount and hit the buttton below');
-        if(isset($options['textbox_text'])){
-            $textbox_text = $options['textbox_text'];
+        $amount_description = $this->default_amount_description;
+        if(isset($options['amount_description'])){
+            $amount_description = $options['amount_description'];
         }
  
-        echo "<input class='regular-text ltr' name='{$current_options_name}[textbox_text]' id='textbox_text'  value='{$textbox_text}'/>";        
+        echo "<input class='regular-text ltr' name='{$current_options_name}[amount_description]' id='amount_description'  value='{$amount_description}'/>";        
     }
 
 
-    function paypal_button_textbox_location(){
+    function textbox_location_callback(){
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;
 
@@ -304,7 +348,7 @@ class paypalAmount {
     }
 
 
-    function paypal_button_size_callback() {
+    function button_size_callback() {
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;
 
@@ -324,7 +368,7 @@ class paypalAmount {
     }
 
 
-    function paypal_button_type_callback(){
+    function button_type_callback(){
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;        
 
@@ -342,7 +386,7 @@ class paypalAmount {
     }
 
 
-    function paypal_button_callback(){
+    function button_callback(){
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;
 
@@ -373,11 +417,68 @@ class paypalAmount {
                 <input type='radio' name='<?= $current_options_name ?>[button_id]' value='<?= $id ?>' <?= $is_checked ?>>
                 <img src='<?= $url ?>' style='vertical-align: middle; margin: 10px;'>
                 </label>
-                </p>
+            </p>
             <?php          
 
         endforeach;	
     }
+
+
+    function currency_callback() {
+        $options = get_option(paypalAmount::$options_name);
+        $current_options_name = paypalAmount::$options_name;    
+
+        $currencies = array(
+            'AUD' => 'Australian Dollars (A $)',
+            'BRL' => 'Brazilian Real',
+            'CAD' => 'Canadian Dollars (C $)',
+            'CZK' => 'Czech Koruna',
+            'DKK' => 'Danish Krone',
+            'EUR' => 'Euros (€)',
+            'HKD' => 'Hong Kong Dollar ($)',
+            'HUF' => 'Hungarian Forint',
+            'ILS' => 'Israeli New Shekel',
+            'JPY' => 'Yen (¥)',
+            'MYR' => 'Malaysian Ringgit',
+            'MXN' => 'Mexican Peso',
+            'NOK' => 'Norwegian Krone',
+            'NZD' => 'New Zealand Dollar ($)',
+            'PHP' => 'Philippine Peso',
+            'PLN' => 'Polish Zloty',
+            'GBP' => 'Pounds Sterling (£)',
+            'RUB' => 'Russian Ruble',
+            'SGD' => 'Singapore Dollar ($)',
+            'SEK' => 'Swedish Krona',
+            'CHF' => 'Swiss Franc',
+            'TWD' => 'Taiwan New Dollar',
+            'THB' => 'Thai Baht',
+            'TRY' => 'Turkish Lira',
+            'USD' => 'U.S. Dollars ($)',
+        );
+
+
+        $currency = 'USD';
+        if(isset($options['currency'])){
+            $currency  = $options['currency'];
+        }
+
+        ?>
+        <select id='currency' name='<?= $current_options_name ?>[currency]'>
+        <?php
+            foreach($currencies as $code => $description) :
+                if( $code == $currency ){ 
+                    $selected = "selected"; 
+                } 
+                else { 
+                    $selected = ""; 
+                }
+                echo "<option {$selected} value='{$code}'>{$description}</option>";
+            endforeach;	
+        ?>
+        </select>
+        <?php
+    }
+
 
 
     function options_callback() {
