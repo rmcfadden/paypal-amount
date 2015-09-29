@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Paypal Amount
 * Plugin URI: https://github.com/rmcfadden/paypal-amount
-* Description: Add a paypal button to your wordpress site with an a optinal payment amount textbox.  Choose from multiple paypal buttons.
+* Description: Add a paypal button to your wordpress site with an a optional payment amount textbox.  Choose from multiple paypal buttons.
 * Version: 1.0
 * Author: Ryan McFadden
 * Author URI: https://github.com/rmcfadden
