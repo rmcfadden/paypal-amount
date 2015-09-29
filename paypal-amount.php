@@ -13,6 +13,9 @@
 add_action('plugins_loaded', array( 'paypalAmount', 'load' ));
 register_activation_hook(__FILE__, array('paypalAmount',  'activation' ));
 
+// TODO: shortcodes with parameters
+// https://developer.wordpress.org/plugins/shortcodes/shortcodes-with-parameters/
+
 class paypalAmount {
 
     private $options;
@@ -22,30 +25,30 @@ class paypalAmount {
 
     // https://developer.paypal.com/docs/classic/api/buttons/
     private static $paypal_buttons = array(
-        1 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_pponly_142x27.png", array("all")),    
-        2 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_checkout_pp_142x27.png",array("checkout")),
-        3 => array("large", "https://www.paypalobjects.com/en_US/i/btn/x-click-but6.gif",array("buynow")),
-        4 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_addtocart_96x21.png",array("addtocart")),
-        5 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_addtocart_120x26.png",array("addtocart")),
-        6 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_86x21.png",array("buynow")),
-        7 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_107x26.png",array("buynow")),
-        8 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_cc_171x47.png",array("buynow")),
-        9 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_pp_142x27.png",array("buynow")),
-        10 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_74x21.png",array("donate")),
-        11 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_92x26.png",array("donate")),
-        12 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_cc_147x47.png",array("donate")),
-        13 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_pp_142x27.png",array("donate")),
-        14 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_86x21.png",array("buynow")),
-        15 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_107x26.png",array("buynow")),
-        16 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_cc_144x47.png",array("buynow")),
-        17 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_subscribe_91x21.png",array("subscribe")),
-        18 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_subscribe_113x26.png",array("subscribe")),
-        19 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_subscribe_cc_147x47.png",array("subscribe")),
-        20 => array("small", "https://www.paypalobjects.com/webstatic/en_US/logo/pp_cc_mark_37x23.png",array("buynow")),
-        21 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/logo/pp_cc_mark_74x46.png",array("buynow")),
-        22 => array("large", "https://www.paypalobjects.com/webstatic/en_US/logo/pp_cc_mark_111x69.png",array("buynow")),
-        23 => array("extralarge", "https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg",array("buynow")),
-        24 => array("extralarge", "https://www.paypalobjects.com/webstatic/mktg/logo/bdg_now_accepting_pp_2line_w.png",array("buynow"))
+        1 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_pponly_142x27.png", "all"),    
+        2 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_checkout_pp_142x27.png","checkout"),
+        3 => array("large", "https://www.paypalobjects.com/en_US/i/btn/x-click-but6.gif","buynow"),
+        4 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_addtocart_96x21.png","addtocart"),
+        5 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_addtocart_120x26.png","addtocart"),
+        6 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_86x21.png","buynow"),
+        7 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_107x26.png","buynow"),
+        8 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_cc_171x47.png","buynow"),
+        9 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_buynow_pp_142x27.png","buynow"),
+        10 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_74x21.png","donate"),
+        11 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_92x26.png","donate"),
+        12 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_cc_147x47.png","donate"),
+        13 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_pp_142x27.png","donate"),
+        14 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_86x21.png","buynow"),
+        15 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_107x26.png","buynow"),
+        16 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_paynow_cc_144x47.png","buynow"),
+        17 => array("small", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_subscribe_91x21.png","subscribe"),
+        18 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_subscribe_113x26.png","subscribe"),
+        19 => array("large", "https://www.paypalobjects.com/webstatic/en_US/btn/btn_subscribe_cc_147x47.png","subscribe"),
+        20 => array("small", "https://www.paypalobjects.com/webstatic/en_US/logo/pp_cc_mark_37x23.png","buynow"),
+        21 => array("medium", "https://www.paypalobjects.com/webstatic/en_US/logo/pp_cc_mark_74x46.png","buynow"),
+        22 => array("large", "https://www.paypalobjects.com/webstatic/en_US/logo/pp_cc_mark_111x69.png","buynow"),
+        23 => array("extralarge", "https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg","buynow"),
+        24 => array("extralarge", "https://www.paypalobjects.com/webstatic/mktg/logo/bdg_now_accepting_pp_2line_w.png","buynow")
     );
 
     public static function load() {
@@ -79,7 +82,7 @@ class paypalAmount {
         add_action('admin_init', array( $this, 'admin_init' ));
         add_action('init', array( $this, 'init' ));
 
-        $this->default_textbox_text  = __('Please enter payment amount and hit the buttton below');
+        $this->default_textbox_text  = __('Please enter payment amount and hit the buttton below:');
 
     }
 
@@ -89,12 +92,20 @@ class paypalAmount {
         $options = get_option( paypalAmount::$options_name );
 
         $image_url = 'https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif';
-        
+        $cmd_value = '_xclick';    
+
         if(isset($options['button_id'])){ 
             $button_id = $options['button_id'];
 
             if(isset(paypalAmount::$paypal_buttons[$button_id])){
-                $image_url = paypalAmount::$paypal_buttons[$button_id][1];                
+                $image_url = paypalAmount::$paypal_buttons[$button_id][1];
+  
+                if(isset(paypalAmount::$paypal_buttons[$button_id][2])){
+                    $command_value = paypalAmount::$paypal_buttons[$button_id][2];
+                    if($command_value == "donate"){
+                        $cmd_value = "_donations";
+                    }
+                }                                        
             }
         }
 
@@ -109,10 +120,7 @@ class paypalAmount {
         }
 
 
-        $cmd_value = '_xclick';
-        if($paypal_type == "donate"){
-            $cmd_value = "_donations";
-        }
+        
 
 
         $target = 'paypal';
@@ -127,17 +135,25 @@ class paypalAmount {
         }
 
 
-        $textbox_text = 'top';
-        if(isset($options['textbox_location'])){
-            $textbox_location = $options['textbox_location'];
+        $textbox_text = $this->default_textbox_text;
+        if(isset($options['textbox_text'])){
+            $textbox_text = $options['textbox_text'];
+        }
+
+        $text_amount_label = '<label>' . $textbox_text  . '</label>';
+        $text_amount_text = '<input type="text" class="paypal-amount-textbox" name="amount" onkeyup="checkDecimal(this)" value="0.00" >';
+        if($textbox_location == 'hidden'){
+            $text_amount_label = '';
+            $text_amount_text = '';
         }
 
 	    return '<form   action="https://www.paypal.com/cgi-bin/webscr" method="post">
     			<div class="paypal_amount">
                     <input type="hidden" name="cmd" value="' . $cmd_value . '">
-			        <input type="hidden" name="business" value="' . $paypal_id . '">
-			        <input type="text" name="amount" onkeyup="checkDecimal(this)" value="0.00" >
-			        <input type="image" src="'. $image_url . '" name="submit">
+			        <input type="hidden" name="business" value="' . $paypal_id . '">'
+                    . $text_amount_label 
+                    . $text_amount_text .
+			        '<input type="image" src="'. $image_url . '" name="submit">
                     <input type="hidden" name="currency_code" value="USD">
 			    </div>
 			</form>';
@@ -346,7 +362,7 @@ class paypalAmount {
             $type = 'buynow';
             if(isset($button_info[2]))
             {
-                $type = implode($button_info[2]);          
+                $type = $button_info[2];          
             }
 
             $button_id = -1;
