@@ -51,10 +51,12 @@ class paypalAmount {
         24 => array("extralarge", "https://www.paypalobjects.com/webstatic/mktg/logo/bdg_now_accepting_pp_2line_w.png","buynow")
     );
 
+
     public static function load() {
         $class = __CLASS__;
         new $class;
     }
+
 
     public static function activation() {
         $new_options = array(
@@ -76,6 +78,7 @@ class paypalAmount {
 
     }
 
+
     public function __construct() { 
         add_shortcode( 'paypal_amount', array( $this, 'shortcode' )); 
         add_action('admin_menu', array( $this, 'admin_option_init'));
@@ -85,6 +88,7 @@ class paypalAmount {
         $this->default_textbox_text  = __('Please enter payment amount and hit the buttton below:');
 
     }
+
 
     // Good refeence for paypal button code: http://planetoftheweb.com/components/promos.php?id=542
     public function shortcode() 
@@ -153,13 +157,16 @@ class paypalAmount {
             </form>';
     }
 
+
     public function init() {
         wp_enqueue_script('paypal-amount.js', plugin_dir_url(__FILE__) . 'paypal-amount.js', array('jquery'));  
     }
 
+
     public function admin_option_init() {
         add_options_page('PayPal Amount', 'PayPal Amount', 'manage_options', paypalAmount::$page_name, array( $this, 'admin_options_page' ));
     }
+
 
     public function admin_options_page() {
         $this->options = get_option( paypalAmount::$options_name );
@@ -177,6 +184,7 @@ class paypalAmount {
         </div>
         <?php
     }
+
 
     public function admin_init() {
 
@@ -264,6 +272,7 @@ class paypalAmount {
 	    echo "<input class='regular-text ltr' name='{$current_options_name}[paypal_id]' id='paypal_id'  value='{$options['paypal_id']}'/>";
     }
 
+
     function paypal_button_textbox_text(){
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;
@@ -275,6 +284,7 @@ class paypalAmount {
  
         echo "<input class='regular-text ltr' name='{$current_options_name}[textbox_text]' id='textbox_text'  value='{$textbox_text}'/>";        
     }
+
 
     function paypal_button_textbox_location(){
         $options = get_option(paypalAmount::$options_name);
@@ -313,6 +323,7 @@ class paypalAmount {
         <?php                  
     }
 
+
     function paypal_button_type_callback(){
         $options = get_option(paypalAmount::$options_name);
         $current_options_name = paypalAmount::$options_name;        
@@ -329,6 +340,7 @@ class paypalAmount {
         </select>
         <?php                  
     }
+
 
     function paypal_button_callback(){
         $options = get_option(paypalAmount::$options_name);
@@ -364,12 +376,13 @@ class paypalAmount {
                 </p>
             <?php          
 
-    endforeach;	
+        endforeach;	
     }
 
 
     function options_callback() {
     }
+
 
     public function sanitize( $input ){
 
