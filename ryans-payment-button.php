@@ -1,7 +1,7 @@
 <?php
 /**
-* Plugin Name: Paypal Amount
-* Plugin URI: https://github.com/rmcfadden/paypal-amount
+* Plugin Name: Ryan's Payment Button
+* Plugin URI: https://github.com/rmcfadden/ryans-payment-button
 * Description: Add a paypal button to your wordpress site with an a optional payment amount textbox.  Choose from multiple paypal buttons.
 * Version: 1.0
 * Author: Ryan McFadden
@@ -10,17 +10,17 @@
 */
 
 
-add_action('plugins_loaded', array( 'paypalAmount', 'load' ));
-register_activation_hook(__FILE__, array('paypalAmount',  'activation' ));
+add_action('plugins_loaded', array( 'ryansPaymentButton', 'load' ));
+register_activation_hook(__FILE__, array('ryansPaymentButton',  'activation' ));
 
 // TODO: shortcodes with parameters
 // https://developer.wordpress.org/plugins/shortcodes/shortcodes-with-parameters/
 
-class paypalAmount {
+class ryansPaymentButton {
 
     private $options;
-    private static $page_name = 'paypal_amount';
-    private static $options_name = 'paypal_amount_options';
+    private static $page_name = 'ryans_payment_button';
+    private static $options_name = 'ryans_payment_button_options';
     private $default_amount_description = '';
 
     // https://developer.paypal.com/docs/classic/api/buttons/
@@ -62,31 +62,30 @@ class paypalAmount {
         $new_options = array(
             'paypal_id' => -1,
             'button_id' => 0,
-            'button_size' => 'small',
-            'button_type' => 'buynow',
+            'size' => 'small',
+            'type' => 'buynow',
             'textbox_location' => 'top',
             'amount_description' => $default_amount_description,
             'amount_default' => 20.00,
             'currency' => 'USD'
         );
 
-        if ( get_option(paypalAmount::$options_name ) !== false ) {
-            update_option(paypalAmount::$options_name, $new_options );
+        if ( get_option(ryansPaymentButton::$options_name ) !== false ) {
+            update_option(ryansPaymentButton::$options_name, $new_options );
         } 
         else{
-            add_option(paypalAmount::$options_name, $new_options );
+            add_option(ryansPaymentButton::$options_name, $new_options );
         }
-
     }
 
 
     public function __construct() { 
-        add_shortcode( 'paypal_amount', array( $this, 'shortcode' )); 
+        add_shortcode( 'ryans_payment_button', array( $this, 'shortcode' )); 
         add_action('admin_menu', array( $this, 'admin_option_init'));
         add_action('admin_init', array( $this, 'admin_init' ));
         add_action('init', array( $this, 'init' ));
 
-        $this->default_amount_description  = __('Please enter payment amount and hit the buttton below:');
+        $this->default_amount_description  = __('Please enter payment amount and click the button below:');
 
     }
 
@@ -94,7 +93,7 @@ class paypalAmount {
     // Good refeence for paypal button code: http://planetoftheweb.com/components/promos.php?id=542
     public function shortcode() 
     {
-        $options = get_option( paypalAmount::$options_name );
+        $options = get_option( ryansPaymentButton::$options_name );
 
         $image_url = 'https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif';
         $cmd_value = '_xclick';    
@@ -102,11 +101,11 @@ class paypalAmount {
         if(isset($options['button_id'])){ 
             $button_id = $options['button_id'];
 
-            if(isset(paypalAmount::$paypal_buttons[$button_id])){
-                $image_url = paypalAmount::$paypal_buttons[$button_id][1];
+            if(isset(ryansPaymentButton::$paypal_buttons[$button_id])){
+                $image_url = ryansPaymentButton::$paypal_buttons[$button_id][1];
   
-                if(isset(paypalAmount::$paypal_buttons[$button_id][2])){
-                    $command_value = paypalAmount::$paypal_buttons[$button_id][2];
+                if(isset(ryansPaymentButton::$paypal_buttons[$button_id][2])){
+                    $command_value = ryansPaymentButton::$paypal_buttons[$button_id][2];
                     if($command_value == "donate"){
                         $cmd_value = "_donations";
                     }
@@ -120,8 +119,8 @@ class paypalAmount {
         }
 
         $paypal_type = 'buynow';
-        if(isset($options['paypal_type'])){
-            $paypal_type = $options['paypal_type'];
+        if(isset($options['type'])){
+            $paypal_type = $options['type'];
         }
 
         $target = 'paypal';
@@ -150,14 +149,14 @@ class paypalAmount {
         }
 
         $text_amount_label = "<label>" . $amount_description  . "</label>\n";
-        $text_amount_text = '<input type="text" class="paypal-amount-textbox" name="amount" onkeyup="paypal_amount_check_decimal(this)" value="' . $amount_default . '" >';
+        $text_amount_text = '<input type="text" class="ryans-payment-button-textbox" name="amount" onkeyup="ryans_payment_button_check_decimal(this)" value="' . $amount_default . '" >';
         if($textbox_location == 'hidden'){
             $text_amount_label = '';
             $text_amount_text = '';
         }
 
         return '<form   action="https://www.paypal.com/cgi-bin/webscr" method="post">
-            <div class="paypal-amount">
+            <div class="ryans-payment-button">
                 <input type="hidden" name="cmd" value="' . $cmd_value . '">
                 <input type="hidden" name="business" value="' . $paypal_id . '">'
                 . $text_amount_label 
@@ -170,26 +169,26 @@ class paypalAmount {
 
 
     public function init() {
-        wp_enqueue_script('paypal-amount.js', plugin_dir_url(__FILE__) . 'paypal-amount.js', array('jquery')); 
-        wp_enqueue_style( 'paypal-amount', plugin_dir_url(__FILE__) . 'paypal-amount.css' ); 
+        wp_enqueue_script('ryans-payment-button.js', plugin_dir_url(__FILE__) . 'ryans-payment-button.js', array('jquery')); 
+        wp_enqueue_style( 'ryans-payment-button', plugin_dir_url(__FILE__) . 'ryans-payment-button.css' ); 
     }
 
 
     public function admin_option_init() {
-        add_options_page('PayPal Amount', 'PayPal Amount', 'manage_options', paypalAmount::$page_name, array( $this, 'admin_options_page' ));
+        add_options_page('Ryan\'s Payment Button, 'Ryan\'s Payment Button', 'manage_options', ryansPaymentButton::$page_name, array( $this, 'admin_options_page' ));
     }
 
 
     public function admin_options_page() {
-        $this->options = get_option( paypalAmount::$options_name );
+        $this->options = get_option( ryansPaymentButton::$options_name );
 
         ?>
         <div class="wrap">
             <h2>PayPal Amount</h2>           
             <form method="post" action="options.php">
             <?php
-                settings_fields(paypalAmount::$options_name );   
-                do_settings_sections( paypalAmount::$page_name );
+                settings_fields(ryansPaymentButton::$options_name );   
+                do_settings_sections( ryansPaymentButton::$page_name );
                 submit_button(); 
             ?>
             </form>
@@ -199,30 +198,29 @@ class paypalAmount {
 
 
     public function admin_init() {
-
-        wp_enqueue_script('paypal-amount-admin.js', plugin_dir_url(__FILE__) . 'paypal-amount-admin.js', array('jquery'));
-        wp_enqueue_script('paypal-amount.js', plugin_dir_url(__FILE__) . 'paypal-amount.js', array('jquery')); 
+        wp_enqueue_script('ryans-payment-button-admin.js', plugin_dir_url(__FILE__) . 'ryans-payment-button-admin.js', array('jquery'));
+        wp_enqueue_script('ryans-payment-button.js', plugin_dir_url(__FILE__) . 'ryans-payment-button.js', array('jquery')); 
 
         register_setting(
-            paypalAmount::$options_name,
-            paypalAmount::$options_name,
+            ryansPaymentButton::$options_name,
+            ryansPaymentButton::$options_name,
             array( $this, 'sanitize' )
         );
 
-        $section_name = paypalAmount::$options_name + '_section';
+        $section_name = ryansPaymentButton::$options_name + '_section';
 
         add_settings_section(
             $section_name,
             __('Change your settings below.  Don\'t forget to hit \'Save Changes!\' to apply!'),
             array($this, 'options_callback'),
-            paypalAmount::$page_name
+            ryansPaymentButton::$page_name
         );
 
         add_settings_field(
             'paypal_id', 
             __('PayPal id/Email:'), 
             array($this,'paypal_id_callback'), 
-            paypalAmount::$page_name, 
+            ryansPaymentButton::$page_name, 
             $section_name,
             array( 'label_for' => 'paypal_id' )
         );
@@ -231,28 +229,28 @@ class paypalAmount {
             'currency', 
             __('Currency:'), 
             array($this,'currency_callback'), 
-            paypalAmount::$page_name, 
+            ryansPaymentButton::$page_name, 
             $section_name,
             array( 'label_for' => 'currency' )
         );
 
         add_settings_field(
-            'button_type', 
-            __('Button type:'), 
-            array($this,'button_type_callback'), 
-            paypalAmount::$page_name, 
+            'type', 
+            __('Type:'), 
+            array($this,'type_callback'), 
+            ryansPaymentButton::$page_name, 
             $section_name,
-            array( 'label_for' => 'button_type' )
+            array( 'label_for' => 'type' )
         );
 
 
         add_settings_field(
-            'button_size', 
-            __('Button size:'), 
-            array($this,'button_size_callback'), 
-            paypalAmount::$page_name, 
+            'size', 
+            __('Size:'), 
+            array($this,'size_callback'), 
+            ryansPaymentButton::$page_name, 
             $section_name,
-            array( 'label_for' => 'button_size' )
+            array( 'label_for' => 'size' )
         );
 
 
@@ -260,27 +258,25 @@ class paypalAmount {
             'button_id', 
             __('Choose a button:'), 
             array($this,'button_callback'), 
-            paypalAmount::$page_name, 
+            ryansPaymentButton::$page_name, 
             $section_name,
             array( 'label_for' => 'button_id' )
         );
-
 
         add_settings_field(
             'textbox_location', 
             __('Textbox location:'), 
             array($this,'textbox_location_callback'), 
-            paypalAmount::$page_name, 
+            ryansPaymentButton::$page_name, 
             $section_name,
             array( 'label_for' => 'textbox_location' )
         );
-
 
         add_settings_field(
             'amount_description', 
             __('Text:'), 
             array($this,'amount_description_callback'), 
-            paypalAmount::$page_name, 
+            ryansPaymentButton::$page_name, 
             $section_name,
             array( 'label_for' => 'amount_description' )
         );
@@ -289,7 +285,7 @@ class paypalAmount {
             'amount_default', 
             __('Amount Default:'), 
             array($this,'amount_default_callback'), 
-            paypalAmount::$page_name, 
+            ryansPaymentButton::$page_name, 
             $section_name,
             array( 'label_for' => 'amount_default' )
         );
@@ -297,29 +293,29 @@ class paypalAmount {
 
 
     function amount_default_callback(){
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;
 
         $amount_default = 20.00;
         if(isset($options['amount_default'])){
             $amount_default = $options['amount_default'];
         }
 
-        echo "<input class='regular-text ltr' id='amount_default' name='{$current_options_name}[amount_default]' onkeyup='paypal_amount_check_decimal(this)' value='{$amount_default}' >";
+        echo "<input class='regular-text ltr' id='amount_default' name='{$current_options_name}[amount_default]' onkeyup='ryans_payment_button_check_decimal(this)' value='{$amount_default}' >";
     }
 
 
     function paypal_id_callback() {
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;
 
 	    echo "<input class='regular-text ltr' name='{$current_options_name}[paypal_id]' id='paypal_id'  value='{$options['paypal_id']}'/>";
     }
 
 
     function amount_description_callback(){
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;
 
         $amount_description = $this->default_amount_description;
         if(isset($options['amount_description'])){
@@ -331,8 +327,8 @@ class paypalAmount {
 
 
     function textbox_location_callback(){
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;
 
         $textbox_location = 'top';
         if(isset($options['textbox_location'])){
@@ -340,7 +336,7 @@ class paypalAmount {
         }
 
         ?>
-        <select id='paypal_amount_textbox_location' name='<?= $current_options_name ?>[textbox_location]'>
+        <select id='ryans_payment_button_textbox_location' name='<?= $current_options_name ?>[textbox_location]'>
             <option value='hidden' <?php if($textbox_location  == 'hidden') { echo 'selected'; }  ?>>Hidden</option>
             <option value='top' <?php if($textbox_location  == 'top') { echo 'selected'; }  ?>>Top</option>
         </select>
@@ -348,17 +344,17 @@ class paypalAmount {
     }
 
 
-    function button_size_callback() {
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;
+    function size_callback() {
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;
 
         $button_size = 'medium';
-        if(isset($options['button_size'])){
-            $button_size = $options['button_size'];    
+        if(isset($options['size'])){
+            $button_size = $options['size'];    
         }
 
         ?>
-        <select id='paypal_amount_button_size' name='<?= $current_options_name ?>[button_size]'>
+        <select id='ryans_payment_button_size' name='<?= $current_options_name ?>[size]'>
             <option value='small' <?php if($button_size == 'small') { echo 'selected'; }  ?>>Small</option>
             <option value='medium' <?php if($button_size == 'medium') { echo 'selected'; }  ?>>Medium</option>
             <option value='large' <?php if($button_size == 'large') { echo 'selected'; }  ?>>Large</option>
@@ -368,9 +364,9 @@ class paypalAmount {
     }
 
 
-    function button_type_callback(){
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;        
+    function type_callback(){
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;        
 
         $button_type = 'buynow';
         if(isset($options['button_type'])){
@@ -378,7 +374,7 @@ class paypalAmount {
         }
 
         ?>
-        <select id='paypal_amount_button_type' name='<?= $current_options_name ?>[button_type]'>
+        <select id='ryans_payment_button_type' name='<?= $current_options_name ?>[button_type]'>
             <option value='buynow' <?php if($button_type == 'buynow') { echo 'selected'; }  ?>>Buy Now</option>
             <option value='donate' <?php if($button_type == 'donate') { echo 'selected'; }  ?>>Donate</option>
         </select>
@@ -387,13 +383,12 @@ class paypalAmount {
 
 
     function button_callback(){
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;
 
-        foreach(paypalAmount::$paypal_buttons as $id => $button_info) :
+        foreach(ryansPaymentButton::$paypal_buttons as $id => $button_info) :
             $size = $button_info[0];
             $url = $button_info[1];
-
 
             $type = 'buynow';
             if(isset($button_info[2]))
@@ -413,7 +408,7 @@ class paypalAmount {
 
             ?>
             <p>
-                <label class="paypal-amount-button-label" data-button-size='<?= $size ?>' data-button-type='<?= $type ?>' >
+                <label class="ryans-payment-button-label" data-button-size='<?= $size ?>' data-button-type='<?= $type ?>' >
                 <input type='radio' name='<?= $current_options_name ?>[button_id]' value='<?= $id ?>' <?= $is_checked ?>>
                 <img src='<?= $url ?>' style='vertical-align: middle; margin: 10px;'>
                 </label>
@@ -424,8 +419,8 @@ class paypalAmount {
 
 
     function currency_callback() {
-        $options = get_option(paypalAmount::$options_name);
-        $current_options_name = paypalAmount::$options_name;    
+        $options = get_option(ryansPaymentButton::$options_name);
+        $current_options_name = ryansPaymentButton::$options_name;    
 
         $currencies = array(
             'AUD' => 'Australian Dollars (A $)',
@@ -483,7 +478,6 @@ class paypalAmount {
 
 
     public function sanitize( $input ){
-
         return $input;
     }
 }

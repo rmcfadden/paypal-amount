@@ -1,4 +1,4 @@
-=== PayPal Amount  ===
+=== Ryan's Payment Button  ===
 Contributors: rmcfadden25
 Tags: PayPal, Buttons
 Requires at least: 3.0
