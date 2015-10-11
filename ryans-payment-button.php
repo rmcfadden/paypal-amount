@@ -86,7 +86,6 @@ class ryansPaymentButton {
         add_action('init', array( $this, 'init' ));
 
         $this->default_amount_description  = __('Please enter payment amount and click the button below:');
-
     }
 
 
@@ -155,7 +154,7 @@ class ryansPaymentButton {
             $text_amount_text = '';
         }
 
-        return '<form   action="https://www.paypal.com/cgi-bin/webscr" method="post">
+        return '<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
             <div class="ryans-payment-button">
                 <input type="hidden" name="cmd" value="' . $cmd_value . '">
                 <input type="hidden" name="business" value="' . $paypal_id . '">'
@@ -409,7 +408,7 @@ class ryansPaymentButton {
             ?>
             <p>
                 <label class="ryans-payment-button-label" data-button-size='<?php echo $size ?>' data-button-type='<?php echo $type ?>' >
-                <input type='radio' name='<?= $current_options_name ?>[button_id]' value='<?php echo $id ?>' <?php echo $is_checked ?>>
+                <input type='radio' name='<?php echo $current_options_name ?>[button_id]' value='<?php echo $id ?>' <?php echo $is_checked ?>>
                 <img src='<?php echo $url ?>' style='vertical-align: middle; margin: 10px;'>
                 </label>
             </p>
