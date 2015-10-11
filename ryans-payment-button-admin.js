@@ -10,9 +10,11 @@ jQuery(document).ready(function () {
 
 function ryans_payment_button_admin_filter_by_size(){
 
-    var button_size = jQuery('#ryans_payment_button_size').val();
-    var button_type = jQuery('#ryans_payment_button_type').val();
-    jQuery('.paypal-amount-button-label').hide();   
+    var size = jQuery('#ryans_payment_button_size').val();
+    var type = jQuery('#ryans_payment_button_type').val();
     
-    jQuery('[data-button-size="' + button_size + '"][data-button-type="' + button_type + '"]').show();
+
+    jQuery('.ryans-payment-button-label').hide();   
+    
+    jQuery('[data-button-size="' + size + '"][data-button-type="' + type + '"]').show();
 }

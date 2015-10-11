@@ -175,7 +175,7 @@ class ryansPaymentButton {
 
 
     public function admin_option_init() {
-        add_options_page('Ryan\'s Payment Button, 'Ryan\'s Payment Button', 'manage_options', ryansPaymentButton::$page_name, array( $this, 'admin_options_page' ));
+        add_options_page('Ryan\'s Payment Button', 'Ryan\'s Payment Button', 'manage_options', ryansPaymentButton::$page_name, array( $this, 'admin_options_page' ));
     }
 
 
@@ -184,7 +184,7 @@ class ryansPaymentButton {
 
         ?>
         <div class="wrap">
-            <h2>PayPal Amount</h2>           
+            <h2>Ryan's Payment Button</h2>           
             <form method="post" action="options.php">
             <?php
                 settings_fields(ryansPaymentButton::$options_name );   
@@ -369,12 +369,12 @@ class ryansPaymentButton {
         $current_options_name = ryansPaymentButton::$options_name;        
 
         $button_type = 'buynow';
-        if(isset($options['button_type'])){
-            $button_type = $options['button_type'];    
+        if(isset($options['type'])){
+            $button_type = $options['type'];    
         }
 
         ?>
-        <select id='ryans_payment_button_type' name='<?= $current_options_name ?>[button_type]'>
+        <select id='ryans_payment_button_type' name='<?= $current_options_name ?>[type]'>
             <option value='buynow' <?php if($button_type == 'buynow') { echo 'selected'; }  ?>>Buy Now</option>
             <option value='donate' <?php if($button_type == 'donate') { echo 'selected'; }  ?>>Donate</option>
         </select>
@@ -408,9 +408,9 @@ class ryansPaymentButton {
 
             ?>
             <p>
-                <label class="ryans-payment-button-label" data-button-size='<?= $size ?>' data-button-type='<?= $type ?>' >
-                <input type='radio' name='<?= $current_options_name ?>[button_id]' value='<?= $id ?>' <?= $is_checked ?>>
-                <img src='<?= $url ?>' style='vertical-align: middle; margin: 10px;'>
+                <label class="ryans-payment-button-label" data-button-size='<?php echo $size ?>' data-button-type='<?php echo $type ?>' >
+                <input type='radio' name='<?= $current_options_name ?>[button_id]' value='<?php echo $id ?>' <?php echo $is_checked ?>>
+                <img src='<?php echo $url ?>' style='vertical-align: middle; margin: 10px;'>
                 </label>
             </p>
             <?php          
