@@ -7,17 +7,17 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Add a paypal button to your wordpress site with an a optinal payment amount textbox.  Choose from multiple paypal buttons.
+Add a Paypal button to your wordpress site with an a optional payment amount textbox.  Choose from multiple Paypal buttons.
 
 == Description ==
 
-Add a paypal button to your wordpress site with an a optinal payment amount textbox.  Choose from multiple paypal buttons.
+Add a Paypal button to your wordpress site with an a optinal payment amount textbox.  Choose from multiple Paypal buttons.
 
 == Screenshots ==
 
-1. PayPal Amount embedded in a page.
-2. PayPal Amount administrative settings page.
-3. How to embed PayPal Amount onto your page.
+1. Ryan's payment button embedded in a page.
+2. Ryan's payment button administrative settings page.
+3. How to embed Ryan's payment button onto your page.
 
 
 == Changelog ==
