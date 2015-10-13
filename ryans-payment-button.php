@@ -1,5 +1,5 @@
 <?php
-/**
+/*
 * Plugin Name: Ryan's Payment Button
 * Plugin URI: https://github.com/rmcfadden/ryans-payment-button
 * Description: Add a paypal button to your wordpress site with an a optional payment amount textbox.  Choose from multiple paypal buttons.
@@ -65,7 +65,7 @@ class ryansPaymentButton {
             'size' => 'small',
             'type' => 'buynow',
             'textbox_location' => 'top',
-            'amount_description' => $default_amount_description,
+            'amount_description' => __('Please enter payment amount and click the button below:'),
             'amount_default' => 20.00,
             'currency' => 'USD'
         );
@@ -480,4 +480,4 @@ class ryansPaymentButton {
         return $input;
     }
 }
-    
+?>
